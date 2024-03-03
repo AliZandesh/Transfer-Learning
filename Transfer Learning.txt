@@ -1,0 +1,199 @@
+
+What is Transfer Learning?
+Let us start with developing an intuition for transfer learning. Let us understand from a simple teacher – student analogy.
+
+A teacher has years of experience in the particular topic he/she teaches. 
+With all this accumulated information, the lectures that students get is a concise and brief overview of the topic. So it can be seen as a “transfer” of information from the learned to a novice.
+
+Transfer Learning” which enables us to use pre-trained models from other people by making small changes. 
+
+A neural network is trained on a data. 
+This network gains knowledge from this data, which is compiled as “weights” of the network. 
+These weights can be extracted and then transferred to any other neural network. 
+Instead of training the other neural network from scratch, we “transfer” the learned features.
+
+
+What is our objective when we train a neural network?
+We wish to identify the correct weights for the network by multiple forward and backward iterations. 
+By using pre-trained models which have been previously trained on large datasets, we can directly use the weights and architecture obtained and apply the learning on our problem statement. 
+
+You should be very careful while choosing what pre-trained model you should use in your case. 
+If the problem statement we have at hand is very different from the one on which the pre-trained model was trained – the prediction we would get would be very inaccurate. 
+For example, a model previously trained for speech recognition would work horribly if we try to use it to identify objects using it.
+
+*********************************************************
+
+We can understand Transfer Learning in terms of Domains and Tasks.
+In our case, the domain is image classification, and our task is to classify food images. 
+
+*********************************************************
+
+Like we did previously, starting from scratch would require many optimizations, more data, and longer training to improve performance. 
+If we use a CNN that's already been optimized and trained for a similar domain and task, we could convert it to work with our task. 
+This is what transfer learning accomplishes.
+
+*********************************************************
+The current dominant paradigm for ML is to run an ML algorithm on a given dataset to generate a model. 
+The model is then applied in real-life tasks. We call this paradigm isolated learning because it does not consider any other related information or the knowledge learned in the past."
+
+*********************************************************
+
+We will utilize the pre-trained VGG16 model, which is a convolutional neural network trained on 1.2 million images to classify 1000 different categories. 
+Since the domain and task for VGG16 are similar to our domain and task, we can use its pre-trained network to do the job.
+
+*********************************************************
+Using the pre-trained layers, we'll extract visual features from our target task/dataset.
+When using these pre-trained layers, we can decide to freeze specific layers from training.
+We'll be using the pre-trained weights as-they-come and not updating them with backpropagation.
+*********************************************************
+Transfer Learning:
+1- Transfer learning is the idea of overcoming the isolated learning paradigm and utilizing knowledge acquired for one task to solve related ones.
+2- It leverages knowledge (features, weights, etc.) from previously trained models for training newer models and even tackles problems like having less data for the newer task.
+3- It optimizes the machine learning process and makes the learning process more efficient.
+4- There is no isolation between models involved in transfer learning since it’s possible (and beneficial) to leverage knowledge from pre-trained models to train new models.
+
+Isolated Learning:
+1- Isolated learning is a traditional machine learning approach that focuses on specific tasks and uses datasets that are meant for a specific task.
+2- It trains isolated models that are used for very specific tasks, and no prior knowledge is retained or accumulated.
+3- The learning process takes place without any relationship with any past knowledge that may be used in different tasks.
+
+isolated learning focuses on specific tasks and uses datasets that are meant for a specific task, while transfer learning leverages knowledge from previously trained models for training newer models and even tackles problems like having less data for the newer task. 
+Transfer learning optimizes the machine learning process and makes the learning process more efficient.
+
+*********************************************************
+ImageNet dataset, a collection of over 14 million images belonging to 22,000 categories.
+The pre-trained VGG16 model, which is a convolutional neural network trained on 1.2 million images to classify 1000 different categories. 
+VGG16 is a convolutional neural network trained on a subset of the ImageNet dataset, 
+
+*********************************************************
+Steps of Process:
+Now suppose we have many images of two kinds of cars: Ferrari sports cars and Audi passenger cars. 
+We want to generate a model that can classify an image as one of the two classes. 
+Writing our own CNN is not an option since we do not have a dataset sufficient in size. 
+Here's where Transfer Learning comes to the rescue!
+
+We know that the ImageNet dataset contains images of different vehicles (sports cars, pick-up trucks, minivans, etc.). 
+We can import a model that has been pre-trained on the ImageNet dataset and use its pre-trained layers for feature extraction.
+
+Now we can't use the entirety of the pre-trained model's architecture. 
+The Fully-Connected layer generates 1,000 different output labels, whereas our Target Dataset has only two classes for prediction. 
+So we'll import a pre-trained model like VGG16, but "cut off" the Fully-Connected layer - also called the "top" model.
+
+Once the pre-trainedlayers have been imported, excluding the "top" of the model, we can take 1 of 2 Transfer Learning approaches.
+*********************************************************
+
+1. Feature Extraction Approach
+
+We use the pre-trained model's architecture to create a new dataset from our input images in this approach. 
+We'll import the Convolutional and Pooling layers but leave out the "top portion" of the model (the Fully-Connected layer).
+
+Recall that our example model, VGG16, has been trained on millions of images - including vehicle images. 
+Its convolutional layers and trained weights can detect generic features such as edges, colors, wheels, windshields, etc.
+
+We'll pass our images through VGG16's convolutional layers, which will output a Feature Stack of the detected visual features. 
+From here, it's easy to flatten the 3-Dimensional feature stack into a NumPy array - ready for whatever modeling you'd prefer to conduct.
+
+
+We can do feature extraction in the following manner:
+
+1- Download the pre-trained model. Ensure that the "top" portion of the model - the Fully-Connected layer - is not included.
+2- Pass the image data through the pre-trained layers to extract convolved visual features
+3- The outputted feature stack will be 3-Dimensional, and for it to be used for prediction by other machine learning classifiers, it will need to be flattened.
+
+4- At this point, you have two options:
+
+4-1 : Stand-Alone Extractor: 
+In this scenario, you can use the pre-trained layers to extract image features once. 
+The extracted features would then create a new dataset that doesn't require any image processing.
+
+4-2: Bootstrap Extractor: 
+Write your own Fully-Connected layer, and integrate it with the pre-trained layers. 
+In this sense, you are bootstrapping your own "top model" onto the pre-trained layers. 
+Initialize this Fully-Connected layer with random weights, which will update via backpropagation during training.
+
+
+
+2. Fine-Tuning Approach
+The goal of fine-tuning is to allow a portion of the pre-trained layers to retrain.
+In the previous approach, we used the pre-trained layers of VGG16 to extract features. 
+We passed our image dataset through the convolutional layers and weights, outputting the transformed visual features. 
+There was no actual training on these pre-trained layers.
+
+
+Fine-tuning a Pre-trained Model entails:
+
+1- Bootstrapping a new "top" portion of the model (i.e., Fully-Connected and Output layers)
+2- Freezing pre-trained convolutional layers
+3- Un-freezing the last few pre-trained layers training.
+The frozen pre-trained layers will convolve visual features as usual. 
+The non-frozen (i.e., the 'trainable') pre-trained layers will be trained on our custom 3- dataset and update according to the Fully-Connected layer's predictions.
+*********************************************************
+
+Recall: 
+1- Custom CNN accuracies is 58%
+2- Transfer Learning Model with Feature Extraction is 73%  
+3- Fine-Tuned Transfer Learning Model is 81%
+
+
+*********************************************************
+
+How do we ensure that we do not miss out on any vital information?
+
+To calculate the output size of a convolutional layer :
+(W - F + 2P) / (S + 1)
+
+W: is the size of the Input volume
+F: the receptive field size of the Convolutional layer filters
+P: the amount of zero-padding used about the border of the output matrix
+S: the stride of the filter
+
+input size (W) is 5
+Our zero-padding scheme is P=1
+the stride S=1
+receptive field of F=3
+
+zero-padding around the edges of the input matrix helps preserve the original input shape. 
+If we were to remove zero-padding, our output would be size 3. 
+
+********************************************************
+https://www.learndatasci.com/tutorials/convolutional-neural-networks-image-classification/#EvaluatingOurNetwork
+
+Image of the fruit bowl: resize the image to have a shape of 224x224x3
+we have a convolutional layer:
+Filter size is a 5 x 5
+Stride = 2
+Padding = 1. 
+In this convolutional layer, the depth (the number of filters) is set to 64.
+
+(W - F + 2P) / (S + 1)
+
+(224 - 5 + 2)/ (2 + 1) = 73.66 # the output size of a convolutional layer 
+
+Since the convolutional layer's depth is 64, the Convolutional output volume will have a size of [73x73x64]
+totalling at 341,056 neurons in the first convolutional layer. 73*73*64 = 341.056
+Each of the 341,056 neurons is connected to a region of size [5x5x3] 
+A region will have 5*5*3=75 weights at a time
+
+At a depth of 64, all neurons are connected to this region of the input, but with varying weighted values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
